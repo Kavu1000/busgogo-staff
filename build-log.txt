@@ -1,0 +1,85 @@
+
+> bus-ticket-staff@0.1.0 build
+> next build
+
+ ⚠ Warning: Found multiple lockfiles. Selecting /Users/kavuthao2007/Desktop/bus-ticket(Phajay)/package-lock.json.
+   Consider removing the lockfiles at:
+   * /Users/kavuthao2007/Desktop/bus-ticket(Phajay)/bus-ticket-staff/package-lock.json
+
+   ▲ Next.js 15.4.3
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 2000ms
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./src/app/driver-reports/page.tsx
+93:8  Warning: React Hook useCallback has a missing dependency: 'initialTripId'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/components/BusManagement.tsx
+113:11  Warning: 'router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+261:70  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/BusSchedule.tsx
+14:5  Warning: 'Filter' is defined but never used.  @typescript-eslint/no-unused-vars
+17:5  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+19:8  Warning: 'MainLayout' is defined but never used.  @typescript-eslint/no-unused-vars
+273:69  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/CheckInOutSystem.tsx
+9:5  Warning: 'XCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+13:5  Warning: 'AlertTriangle' is defined but never used.  @typescript-eslint/no-unused-vars
+15:8  Warning: 'MainLayout' is defined but never used.  @typescript-eslint/no-unused-vars
+55:12  Warning: 'selectedPassenger' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/DashBoard.tsx
+3:20  Warning: 'useEffect' is defined but never used.  @typescript-eslint/no-unused-vars
+5:5  Warning: 'HomeIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+9:5  Warning: 'BellIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+11:5  Warning: 'ClockIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+14:5  Warning: 'XCircleIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+17:17  Warning: 'BellSolidIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/Header.tsx
+2:29  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/PassengerManagement.tsx
+121:12  Warning: 'filter' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+121:20  Warning: 'setFilter' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+125:12  Warning: 'selectedPassenger' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+126:12  Warning: 'showEditModal' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+322:84  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/Report.tsx
+7:5  Warning: 'FileBarChart' is defined but never used.  @typescript-eslint/no-unused-vars
+8:5  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+14:5  Warning: 'Filter' is defined but never used.  @typescript-eslint/no-unused-vars
+19:8  Warning: 'MainLayout' is defined but never used.  @typescript-eslint/no-unused-vars
+162:78  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+192:77  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+351:79  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+567:73  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/Setting.tsx
+13:8  Warning: 'MainLayout' is defined but never used.  @typescript-eslint/no-unused-vars
+112:76  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+262:130  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+277:133  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+307:139  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/SideNav.tsx
+10:5  Warning: 'ClipboardList' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/Sidebar.tsx
+8:5  Warning: 'TicketIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+10:5  Warning: 'ChartBarIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/contexts/AuthContext.tsx
+5:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/useAdminSocket.ts
+8:28  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
