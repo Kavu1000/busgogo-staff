@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -16,6 +15,7 @@ import {
     Clock,
     MapPin
 } from 'lucide-react';
+import { RevenuePieChart, RevenueBarChart, RevenueModelChart, OccupancyLineChart } from './Charts';
 
 
 interface DailyStats {
@@ -64,21 +64,21 @@ const mockDailyStats: DailyStats[] = [
 
 const mockRouteStats: RouteStats[] = [
     {
-        route: 'Bangkok → Chiang Mai',
+        route: 'ວຽງຈັນ → ຫຼວງພະບາງ',
         totalPassengers: 450,
         revenue: 202500,
         avgOccupancy: 90,
         onTimeRate: 94
     },
     {
-        route: 'Bangkok → Phuket',
+        route: 'ວຽງຈັນ → ປາກເຊ',
         totalPassengers: 380,
         revenue: 247000,
         avgOccupancy: 85,
         onTimeRate: 91
     },
     {
-        route: 'Bangkok → Khon Kaen',
+        route: 'ວຽງຈັນ → ສະຫັວນນະເຂດ',
         totalPassengers: 420,
         revenue: 147000,
         avgOccupancy: 88,
@@ -117,16 +117,17 @@ interface WeeklyTrend {
     onTimeRate: number;
     occupancyRate: number;
     totalTrips: number;
+    revenue: number;
 }
 
 const mockWeeklyTrend: WeeklyTrend[] = [
-    { date: '18/07', day: 'Mon', onTimeRate: 88, occupancyRate: 82, totalTrips: 45 },
-    { date: '19/07', day: 'Tue', onTimeRate: 92, occupancyRate: 85, totalTrips: 48 },
-    { date: '20/07', day: 'Wed', onTimeRate: 89, occupancyRate: 88, totalTrips: 52 },
-    { date: '21/07', day: 'Thu', onTimeRate: 95, occupancyRate: 88, totalTrips: 50 },
-    { date: '22/07', day: 'Fri', onTimeRate: 88, occupancyRate: 82, totalTrips: 47 },
-    { date: '23/07', day: 'Sat', onTimeRate: 85, occupancyRate: 90, totalTrips: 55 },
-    { date: '24/07', day: 'Sun', onTimeRate: 92, occupancyRate: 85, totalTrips: 49 }
+    { date: '18/07', day: 'Mon', onTimeRate: 88, occupancyRate: 82, totalTrips: 45, revenue: 385000 },
+    { date: '19/07', day: 'Tue', onTimeRate: 92, occupancyRate: 85, totalTrips: 48, revenue: 412000 },
+    { date: '20/07', day: 'Wed', onTimeRate: 89, occupancyRate: 88, totalTrips: 52, revenue: 445000 },
+    { date: '21/07', day: 'Thu', onTimeRate: 95, occupancyRate: 88, totalTrips: 50, revenue: 428000 },
+    { date: '22/07', day: 'Fri', onTimeRate: 88, occupancyRate: 82, totalTrips: 47, revenue: 398000 },
+    { date: '23/07', day: 'Sat', onTimeRate: 85, occupancyRate: 90, totalTrips: 55, revenue: 475000 },
+    { date: '24/07', day: 'Sun', onTimeRate: 92, occupancyRate: 85, totalTrips: 49, revenue: 425000 }
 ];
 
 export default function Reports() {
@@ -204,7 +205,7 @@ export default function Reports() {
             </div>
 
             {/* Main Content */}
-            <div>
+            <div className="min-h-[500px]">
                 {selectedReport === 'overview' && (
                     <div className="space-y-6">
                         {/* Key Metrics */}
@@ -214,7 +215,7 @@ export default function Reports() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-text-secondary">Total Passengers</p>
-                                        <p className="text-2xl font-bold text-text-primary">{todayStats.totalPassengers.toLocaleString()}</p>
+                                        <p className="text-2xl font-bold text-text-primary">{todayStats.totalPassengers.toLocaleString('en-US')}</p>
                                     </div>
                                     <div className="h-12 w-12 bg-primary-light rounded-lg flex items-center justify-center">
                                         <Users className="h-6 w-6 text-primary" />
@@ -242,7 +243,7 @@ export default function Reports() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-medium text-text-secondary">Revenue</p>
-                                        <p className="text-2xl font-bold text-text-primary">฿{todayStats.totalRevenue.toLocaleString()}</p>
+                                        <p className="text-2xl font-bold text-text-primary">₭{todayStats.totalRevenue.toLocaleString('en-US')}</p>
                                     </div>
                                     <div className="h-12 w-12 bg-success-light rounded-lg flex items-center justify-center">
                                         <DollarSign className="h-6 w-6 text-success" />
@@ -303,6 +304,34 @@ export default function Reports() {
                             </div>
                         </div>
 
+                        {/* Revenue analysis section */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* Revenue by Route (Pie Chart) */}
+                            <div className="bg-bg-secondary border border-border rounded-lg shadow-sm p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-lg font-semibold text-text-primary">Revenue by Route</h3>
+                                    <div className="h-8 w-8 bg-success-light rounded-full flex items-center justify-center">
+                                        <TrendingUp className="h-4 w-4 text-success" />
+                                    </div>
+                                </div>
+                                <RevenuePieChart data={mockRouteStats} />
+                            </div>
+
+                            {/* Daily Revenue Trend (Bar Chart) */}
+                            <div className="bg-bg-secondary border border-border rounded-lg shadow-sm p-6">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-lg font-semibold text-text-primary">Daily Revenue Trend</h3>
+                                    <div className="flex items-center space-x-2 text-sm text-text-secondary">
+                                        <Calendar className="h-4 w-4" />
+                                        <span>Past 7 days</span>
+                                    </div>
+                                </div>
+                                <div className="h-64">
+                                    <RevenueBarChart data={mockWeeklyTrend} />
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Performance Chart Area */}
                         <div className="bg-bg-secondary border border-border rounded-lg shadow-sm p-6">
                             <div className="flex items-center justify-between mb-6">
@@ -313,112 +342,35 @@ export default function Reports() {
                             </div>
 
                             {/* Chart Container */}
-                            <div className="h-80">
-                                {/* Chart Legend */}
-                                <div className="flex items-center justify-center space-x-6 mb-4">
+                            <div className="h-80 flex flex-col">
+                                {/* Legend */}
+                                <div className="flex items-center justify-center space-x-6 mb-2">
                                     <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-primary rounded"></div>
+                                        <div className="w-3 h-3 bg-primary rounded-full"></div>
                                         <span className="text-sm text-text-secondary">On-Time Rate (%)</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-text-tertiary rounded"></div>
+                                        <div className="w-3 h-3 bg-text-tertiary rounded-full"></div>
                                         <span className="text-sm text-text-secondary">Bus Count</span>
                                     </div>
                                 </div>
 
-                                {/* Chart Area */}
-                                <div className="relative h-64 bg-bg-elevated border border-border rounded-lg p-4">
-                                    {/* Y-axis labels */}
-                                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-text-tertiary py-4 pl-2">
-                                        <span>100%</span>
-                                        <span>75%</span>
-                                        <span>50%</span>
-                                        <span>25%</span>
-                                        <span>0%</span>
-                                    </div>
-
-                                    {/* Chart bars and line */}
-                                    <div className="ml-8 h-full relative">
-                                        {/* Grid lines */}
-                                        <div className="absolute inset-0 flex flex-col justify-between">
-                                            {[0, 1, 2, 3, 4].map((i) => (
-                                                <div key={i} className="border-t border-border w-full"></div>
-                                            ))}
-                                        </div>
-
-                                        {/* Chart content */}
-                                        <div className="relative h-full flex items-end justify-between px-2">
-                                            {mockHourlyPerformance.map((data, index) => {
-                                                const barHeight = (data.totalBuses / 22) * 100; // Max 22 buses
-                                                const lineHeight = data.onTimeRate;
-
-                                                return (
-                                                    <div key={data.hour} className="flex flex-col items-center relative group">
-                                                        {/* Tooltip */}
-                                                        <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-text-primary text-bg-primary text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                                            <div>Time: {data.hour}</div>
-                                                            <div>On-Time: {data.onTimeRate}%</div>
-                                                            <div>Buses: {data.totalBuses}</div>
-                                                        </div>
-
-                                                        {/* Performance line point */}
-                                                        <div
-                                                            className="absolute w-2 h-2 bg-primary rounded-full transform -translate-x-1/2 z-20"
-                                                            style={{
-                                                                bottom: `${lineHeight}%`,
-                                                                left: '50%'
-                                                            }}
-                                                        ></div>
-
-                                                        {/* Bus count bar */}
-                                                        <div
-                                                            className="w-4 bg-border rounded-t hover:bg-text-tertiary transition-colors"
-                                                            style={{ height: `${barHeight}%` }}
-                                                        ></div>
-
-                                                        {/* Hour label */}
-                                                        <span className="text-xs text-text-tertiary mt-1 transform -rotate-45 origin-top-left">
-                                                            {data.hour}
-                                                        </span>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-
-                                        {/* Performance line */}
-                                        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                                            <path
-                                                d={`M ${mockHourlyPerformance.map((data, index) => {
-                                                    const x = (index / (mockHourlyPerformance.length - 1)) * 100;
-                                                    const y = 100 - data.onTimeRate;
-                                                    return `${index === 0 ? 'M' : 'L'} ${x}% ${y}%`;
-                                                }).join(' ')}`}
-                                                strokeWidth="2"
-                                                fill="none"
-                                                className="stroke-primary drop-shadow-sm"
-                                            />
-                                        </svg>
-                                    </div>
-
-                                    {/* X-axis title */}
-                                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 text-xs text-text-secondary mt-2">
-                                        Time (hr)
-                                    </div>
-                                </div>
+                                {/* Interactive SVG line chart */}
+                                <OccupancyLineChart data={mockWeeklyTrend} />
 
                                 {/* Summary Stats */}
-                                <div className="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-border">
+                                <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
                                     <div className="text-center">
                                         <div className="text-lg font-semibold text-success">
                                             {Math.max(...mockHourlyPerformance.map(d => d.onTimeRate))}%
                                         </div>
-                                        <div className="text-xs text-text-secondary">Peak Performance</div>
+                                        <div className="text-xs text-text-secondary">Peak On-Time</div>
                                     </div>
                                     <div className="text-center">
                                         <div className="text-lg font-semibold text-error">
                                             {Math.min(...mockHourlyPerformance.map(d => d.onTimeRate))}%
                                         </div>
-                                        <div className="text-xs text-text-secondary">Lowest Performance</div>
+                                        <div className="text-xs text-text-secondary">Lowest On-Time</div>
                                     </div>
                                     <div className="text-center">
                                         <div className="text-lg font-semibold text-primary">
@@ -466,10 +418,10 @@ export default function Reports() {
                                                     {route.route}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
-                                                    {route.totalPassengers.toLocaleString()}
+                                                    {route.totalPassengers.toLocaleString('en-US')}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-text-primary">
-                                                    ฿{route.revenue.toLocaleString()}
+                                                    ₭{route.revenue.toLocaleString('en-US')}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
@@ -525,114 +477,44 @@ export default function Reports() {
                             </div>
                         </div>
 
+
+                        {/* Daily Revenue Trend (Bar Chart) */}
+                        <div className="bg-bg-secondary border border-border rounded-lg shadow-sm p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-lg font-semibold text-text-primary">Daily Revenue Trend</h3>
+                                <div className="flex items-center space-x-2 text-sm text-text-secondary">
+                                    <Calendar className="h-4 w-4" />
+                                    <span>Past 7 days</span>
+                                </div>
+                            </div>
+                            <div className="h-64">
+                                <RevenueBarChart data={mockWeeklyTrend} />
+                            </div>
+                        </div>
+
+
                         <div className="bg-bg-secondary border border-border rounded-lg shadow-sm p-6">
                             <h3 className="text-lg font-semibold text-text-primary mb-4">7-Day Trend</h3>
 
                             {/* Chart Container */}
-                            <div className="h-80">
-                                {/* Chart Legend */}
-                                <div className="flex items-center justify-center space-x-6 mb-4">
+                            <div className="h-80 flex flex-col">
+                                {/* Legend */}
+                                <div className="flex items-center justify-center space-x-6 mb-2">
                                     <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-success rounded"></div>
+                                        <div className="w-3 h-3 bg-success rounded-full"></div>
                                         <span className="text-sm text-text-secondary">On-Time Rate (%)</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <div className="w-3 h-3 bg-primary rounded"></div>
+                                        <div className="w-3 h-3 bg-primary rounded-full"></div>
                                         <span className="text-sm text-text-secondary">Occupancy Rate (%)</span>
                                     </div>
                                 </div>
 
-                                {/* Chart Area */}
-                                <div className="relative h-64 bg-bg-elevated border border-border rounded-lg p-4">
-                                    {/* Y-axis labels */}
-                                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-text-tertiary py-4 pl-2">
-                                        <span>100%</span>
-                                        <span>80%</span>
-                                        <span>60%</span>
-                                        <span>40%</span>
-                                        <span>20%</span>
-                                    </div>
-
-                                    {/* Chart content */}
-                                    <div className="ml-8 h-full relative">
-                                        {/* Grid lines */}
-                                        <div className="absolute inset-0 flex flex-col justify-between">
-                                            {[0, 1, 2, 3, 4].map((i) => (
-                                                <div key={i} className="border-t border-border w-full"></div>
-                                            ))}
-                                        </div>
-
-                                        {/* Data points and labels */}
-                                        <div className="relative h-full flex items-end justify-between px-4">
-                                            {mockWeeklyTrend.map((data, index) => (
-                                                <div key={data.date} className="flex flex-col items-center relative group">
-                                                    {/* Tooltip */}
-                                                    <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-text-primary text-bg-primary text-xs rounded px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                                        <div className="font-medium">{data.day}</div>
-                                                        <div>On-Time: {data.onTimeRate}%</div>
-                                                        <div>Occupancy: {data.occupancyRate}%</div>
-                                                        <div>Trips: {data.totalTrips}</div>
-                                                    </div>
-
-                                                    {/* On-time performance point */}
-                                                    <div
-                                                        className="absolute w-3 h-3 bg-success rounded-full border-2 border-bg-secondary transform -translate-x-1/2 z-20 shadow-sm"
-                                                        style={{
-                                                            bottom: `${(data.onTimeRate / 100) * 100}%`,
-                                                            left: '50%'
-                                                        }}
-                                                    ></div>
-
-                                                    {/* Occupancy rate point */}
-                                                    <div
-                                                        className="absolute w-3 h-3 bg-primary rounded-full border-2 border-bg-secondary transform -translate-x-1/2 z-20 shadow-sm"
-                                                        style={{
-                                                            bottom: `${(data.occupancyRate / 100) * 100}%`,
-                                                            left: '50%'
-                                                        }}
-                                                    ></div>
-
-                                                    {/* Day label */}
-                                                    <div className="text-center mt-2">
-                                                        <div className="text-xs font-medium text-text-primary">{data.date}</div>
-                                                        <div className="text-xs text-text-secondary">{data.day}</div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        {/* On-time performance line */}
-                                        <svg className="absolute inset-0 w-full h-full pointer-events-none ml-4">
-                                            <path
-                                                d={`M ${mockWeeklyTrend.map((data, index) => {
-                                                    const x = (index / (mockWeeklyTrend.length - 1)) * 85 + 7.5; // Adjust for padding
-                                                    const y = 100 - data.onTimeRate;
-                                                    return `${index === 0 ? 'M' : 'L'} ${x}% ${y}%`;
-                                                }).join(' ')}`}
-                                                strokeWidth="2"
-                                                fill="none"
-                                                className="stroke-success drop-shadow-sm"
-                                            />
-                                        </svg>
-
-                                        {/* Occupancy rate line */}
-                                        <svg className="absolute inset-0 w-full h-full pointer-events-none ml-4">
-                                            <path
-                                                d={`M ${mockWeeklyTrend.map((data, index) => {
-                                                    const x = (index / (mockWeeklyTrend.length - 1)) * 85 + 7.5; // Adjust for padding
-                                                    const y = 100 - data.occupancyRate;
-                                                    return `${index === 0 ? 'M' : 'L'} ${x}% ${y}%`;
-                                                }).join(' ')}`}
-                                                strokeWidth="2"
-                                                fill="none"
-                                                className="stroke-primary drop-shadow-sm"
-                                            />
-                                        </svg>
-                                    </div>
-                                </div>
+                                {/* Interactive dual-line chart */}
+                                <OccupancyLineChart data={mockWeeklyTrend} />
 
                                 {/* Weekly Summary */}
-                                <div className="grid grid-cols-4 gap-4 mt-6 pt-4 border-t border-border">
+                                <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t border-border">
                                     <div className="text-center">
                                         <div className="text-lg font-semibold text-success">
                                             {(mockWeeklyTrend.reduce((sum, d) => sum + d.onTimeRate, 0) / mockWeeklyTrend.length).toFixed(1)}%

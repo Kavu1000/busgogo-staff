@@ -1,5 +1,17 @@
 import type { Metadata } from "next";
+import { Inter, Noto_Sans_Lao } from "next/font/google";
 import "./globals.css";
+import { SocketProvider } from "@/context/SocketContext";
+
+const interFont = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const notoFont = Noto_Sans_Lao({
+  subsets: ["lao"],
+  variable: "--font-noto-lao",
+});
 
 export const metadata: Metadata = {
   title: "Bus Ticket Staff",
@@ -12,15 +24,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet" />
-      </head>
-      <body className="antialiased">
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <head suppressHydrationWarning />
+      <body className={`${interFont.variable} ${notoFont.variable} antialiased`} suppressHydrationWarning>
+        <SocketProvider>
+          {children}
+        </SocketProvider>
       </body>
     </html>
   );

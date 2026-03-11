@@ -1,5 +1,5 @@
 'use client';
-
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -11,20 +11,48 @@ import {
     Settings,
     LogOut,
     Ticket,
-    BarChart3
+    BarChart3,
+    MessageSquare
 } from 'lucide-react';
+import ChatSidebar from './ChatSidebar';
+import { useSocket } from '@/context/SocketContext';
 
 const SideNav = () => {
     const pathname = usePathname();
     const router = useRouter();
+    const { socket } = useSocket();
+    const [hasUnread, setHasUnread] = React.useState(false);
+
+    React.useEffect(() => {
+        if (!socket) return;
+
+        const handleNewMessage = () => {
+            if (pathname !== '/chat') {
+                setHasUnread(true);
+            }
+        };
+
+        socket.on('driver_message', handleNewMessage);
+        return () => {
+            socket.off('driver_message', handleNewMessage);
+        };
+    }, [socket, pathname]);
+
+    React.useEffect(() => {
+        if (pathname === '/chat') {
+            setHasUnread(false);
+        }
+    }, [pathname]);
 
     const menuItems = [
         { path: '/', label: 'ໜ້າຫຼັກ (Dashboard)', icon: LayoutDashboard },
         { path: '/bus-schedule', label: 'ຕາຕະລາງເດີນລົດ', icon: Calendar },
         { path: '/bus-management', label: 'ຈັດການລົດເມ', icon: Bus },
         { path: '/passenger-management', label: 'ຈັດການຜູ້ໂດຍສານ', icon: Users },
+        { path: '/user-management', label: 'ຈັດການຜູ້ໃຊ້ (Users)', icon: Users },
         { path: '/check-in-out', label: 'ລະບົບ Check-in/out', icon: Ticket },
         { path: '/report', label: 'ລາຍງານ', icon: BarChart3 },
+        { path: '/chat', label: 'ສົນທະນາ (Chat)', icon: MessageSquare },
         { path: '/setting', label: 'ຕັ້ງຄ່າ', icon: Settings },
     ];
 
@@ -64,6 +92,9 @@ const SideNav = () => {
                                     )}
                                     <Icon className={`h-5 w-5 mr-4 transition-colors ${isActive ? 'text-primary' : 'text-text-tertiary group-hover:text-text-primary'}`} />
                                     <span className={`text-sm tracking-tight ${isActive ? 'font-bold' : 'font-medium'}`}>{item.label}</span>
+                                    {item.path === '/chat' && hasUnread && !isActive && (
+                                        <span className="ml-auto h-2 w-2 bg-error rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                                    )}
                                 </Link>
                             </li>
                         );
@@ -71,11 +102,11 @@ const SideNav = () => {
                 </ul>
             </nav>
 
-            {/* User Profile & Logout */}
+            {/* Logout */}
             <div className="p-4 border-t border-border">
                 <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-2 text-error hover:bg-error-light rounded-lg transition-colors"
+                    className="flex items-center w-full px-4 py-2 text-error hover:bg-error-light rounded-lg transition-colors font-medium text-sm"
                 >
                     <LogOut className="h-5 w-5 mr-3" />
                     ອອກຈາກລະບົບ
