@@ -8,6 +8,7 @@ import {
     Trash2, Loader2, AlertCircle, CheckCircle2
 } from 'lucide-react';
 import MainLayout from './MainLayout';
+import ModalPortal from './Modal';
 import dynamic from 'next/dynamic';
 import { useSocket } from '@/context/SocketContext';
 
@@ -205,35 +206,18 @@ export default function BusManagement() {
         </div>
     );
 
-    // ── MODAL wrapper ─────────────────────────────────────────────────────────
-    const Modal = ({ title, onClose, onSubmit, submitLabel, submitClass = 'bg-primary', children }: any) => (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[2000] p-4 animate-in fade-in duration-200">
-            <div className="bg-bg-secondary border border-border rounded-2xl w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between px-6 py-4 border-b border-border flex-shrink-0">
-                    <h3 className="text-lg font-black text-text-primary">{title}</h3>
-                    <button onClick={onClose} className="p-2 hover:bg-bg-tertiary rounded-xl transition-colors"><XCircle className="w-5 h-5 text-text-tertiary" /></button>
-                </div>
-                <div className="p-6 overflow-y-auto flex-1">
-                    {errorMsg && (
-                        <div className="bg-error-light border border-error/20 text-error p-3 rounded-xl flex items-center text-xs font-bold mb-4">
-                            <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />{errorMsg}
-                        </div>
-                    )}
-                    {children}
-                </div>
-                <div className="flex gap-3 px-6 pb-6 flex-shrink-0">
-                    <button onClick={onClose} className="flex-1 py-2.5 bg-bg-tertiary text-text-primary rounded-xl text-sm font-bold hover:bg-border transition-colors">ຍົກເລີກ</button>
-                    <button onClick={onSubmit} disabled={submitting} className={`flex-[2] py-2.5 text-white rounded-xl text-sm font-bold flex items-center justify-center ${submitClass} disabled:opacity-50`}>
-                        {submitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}{submitLabel}
-                    </button>
-                </div>
-            </div>
+    // Footer buttons helper
+    const ModalFooter = ({ onClose, onSubmit, submitLabel, submitClass = 'bg-blue-600' }: any) => (
+        <div className="flex gap-3">
+            <button onClick={onClose} className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors">ຍົກເລີກ</button>
+            <button onClick={onSubmit} disabled={submitting} className={`flex-[2] py-2.5 text-white rounded-xl text-sm font-bold flex items-center justify-center ${submitClass} disabled:opacity-50`}>
+                {submitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}{submitLabel}
+            </button>
         </div>
     );
 
     return (
-        <MainLayout>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 {/* Header */}
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-bold text-text-primary">ຈັດການຂໍ້ມູນລົດເມ</h1>
@@ -328,36 +312,52 @@ export default function BusManagement() {
 
                 {/* ── ADD MODAL ── */}
                 {showAddModal && (
-                    <Modal title="ເພີ່ມລົດເມໃໝ່" onClose={() => { setShowAddModal(false); setErrorMsg(null); }} onSubmit={handleCreate} submitLabel="ເພີ່ມລົດເມ">
+                    <ModalPortal
+                        title="ເພີ່ມລົດເມໃໝ່"
+                        maxWidth="max-w-4xl"
+                        onClose={() => { setShowAddModal(false); setErrorMsg(null); }}
+                        footer={<ModalFooter onClose={() => { setShowAddModal(false); setErrorMsg(null); }} onSubmit={handleCreate} submitLabel="ເພີ່ມລົດເມ" submitClass="bg-blue-600 hover:bg-blue-700" />}
+                    >
+                        {errorMsg && <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl flex items-center text-xs font-bold mb-4"><AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />{errorMsg}</div>}
                         <BusFormFields />
-                    </Modal>
+                    </ModalPortal>
                 )}
 
                 {/* ── EDIT MODAL ── */}
                 {showEditModal && selectedBus && (
-                    <Modal title={`ແກ້ໄຂ: ${selectedBus.licensePlate}`} onClose={() => { setShowEditModal(false); setErrorMsg(null); }} onSubmit={handleUpdate} submitLabel="ບັນທຶກການແກ້ໄຂ">
+                    <ModalPortal
+                        title={`ແກ້ໄຂ: ${selectedBus.licensePlate}`}
+                        maxWidth="max-w-4xl"
+                        onClose={() => { setShowEditModal(false); setErrorMsg(null); }}
+                        footer={<ModalFooter onClose={() => { setShowEditModal(false); setErrorMsg(null); }} onSubmit={handleUpdate} submitLabel="ບັນທຶກການແກ້ໄຂ" submitClass="bg-blue-600 hover:bg-blue-700" />}
+                    >
+                        {errorMsg && <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl flex items-center text-xs font-bold mb-4"><AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />{errorMsg}</div>}
                         <BusFormFields />
-                    </Modal>
+                    </ModalPortal>
                 )}
 
                 {/* ── DELETE MODAL ── */}
                 {showDeleteModal && selectedBus && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[2000] p-4">
-                        <div className="bg-bg-secondary border border-border rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
-                            <div className="h-16 w-16 bg-error-light text-error rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-8 h-8" /></div>
-                            <h3 className="text-xl font-black text-text-primary mb-2">ຢືນຢັນການລຶບ?</h3>
-                            <p className="text-text-tertiary text-sm mb-6">ທ່ານຕ້ອງການລຶບລົດ <span className="font-bold text-text-primary">{selectedBus.licensePlate}</span> ແມ່ນບໍ່? ການກະທຳນີ້ບໍ່ສາມາດຍ້ອນກັບໄດ້.</p>
-                            {errorMsg && <div className="bg-error-light text-error p-3 rounded-xl text-xs font-bold mb-4 flex items-center"><AlertCircle className="w-4 h-4 mr-2" />{errorMsg}</div>}
+                    <ModalPortal
+                        title="ຢືນຢັນການລຶບ"
+                        onClose={() => { setShowDeleteModal(false); setErrorMsg(null); }}
+                        maxWidth="max-w-md"
+                        footer={
                             <div className="flex gap-3">
-                                <button onClick={() => { setShowDeleteModal(false); setErrorMsg(null); }} className="flex-1 py-3 bg-bg-tertiary rounded-xl text-sm font-bold">ຍົກເລີກ</button>
-                                <button onClick={handleDelete} disabled={submitting} className="flex-1 py-3 bg-error text-white rounded-xl text-sm font-bold flex items-center justify-center disabled:opacity-50">
+                                <button onClick={() => { setShowDeleteModal(false); setErrorMsg(null); }} className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-bold">ຍົກເລີກ</button>
+                                <button onClick={handleDelete} disabled={submitting} className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-bold flex items-center justify-center disabled:opacity-50">
                                     {submitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}ຢືນຢັນລຶບ
                                 </button>
                             </div>
+                        }
+                    >
+                        <div className="text-center py-2">
+                            <div className="h-16 w-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-8 h-8" /></div>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">ທ່ານຕ້ອງການລຶບລົດ <span className="font-bold text-gray-900 dark:text-white">{selectedBus.licensePlate}</span> ແມ່ນບໍ່?<br/>ການກະທຳນີ້ບໍ່ສາມາດຍ້ອນກັບໄດ້.</p>
+                            {errorMsg && <div className="bg-red-50 text-red-700 border border-red-200 p-3 rounded-xl text-xs font-bold mt-4 flex items-center"><AlertCircle className="w-4 h-4 mr-2" />{errorMsg}</div>}
                         </div>
-                    </div>
+                    </ModalPortal>
                 )}
             </div>
-        </MainLayout>
     );
 }

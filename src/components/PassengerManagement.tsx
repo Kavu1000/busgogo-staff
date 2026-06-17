@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
     Users, Search, Plus, Pencil, Trash2, CheckCircle, XCircle,
-    Phone, Mail, Ticket, MapPin, Clock, Filter, Loader2, AlertCircle, CheckCircle2
+    Phone, Mail, Ticket, MapPin, Clock, Filter, Loader2, AlertCircle, CheckCircle2, Ban
 } from 'lucide-react';
 import MainLayout from './MainLayout';
+import ModalPortal from './Modal';
 
 interface Booking {
     _id: string;
@@ -153,8 +154,7 @@ export default function PassengerManagement() {
     const displayName = (b: Booking) => b.passengerDetails?.name || b.userId?.username || '—';
 
     return (
-        <MainLayout>
-            <div className="space-y-6">
+        <div className="space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -250,7 +250,6 @@ export default function PassengerManagement() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right">
                                                 <div className="flex items-center justify-end space-x-2">
-                                                    {/* Quick status change */}
                                                     <select value={booking.status} onChange={e => handleStatusChange(booking, e.target.value as Booking['status'])} className="text-xs border border-border bg-bg-secondary rounded px-2 py-1.5 focus:ring-1 focus:ring-primary outline-none text-text-primary">
                                                         {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                                                     </select>
@@ -268,81 +267,86 @@ export default function PassengerManagement() {
 
                 {/* ── EDIT MODAL ── */}
                 {showEditModal && selectedBooking && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-                        <div className="bg-bg-secondary border border-border rounded-2xl w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-200">
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-                                <h3 className="text-lg font-black text-text-primary">ແກ້ໄຂ: #{selectedBooking._id.slice(-6).toUpperCase()}</h3>
-                                <button onClick={() => { setShowEditModal(false); setErrorMsg(null); }} className="p-2 hover:bg-bg-tertiary rounded-xl"><XCircle className="w-5 h-5 text-text-tertiary" /></button>
-                            </div>
-                            <div className="p-6 space-y-4">
-                                {errorMsg && <div className="bg-error-light text-error p-3 rounded-xl text-xs font-bold flex items-center"><AlertCircle className="w-4 h-4 mr-2" />{errorMsg}</div>}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-text-secondary mb-1 block">ຕົ້ນທາງ</label>
-                                        <input className="w-full px-3 py-2.5 bg-bg-tertiary border border-border rounded-xl text-sm text-text-primary focus:ring-2 focus:ring-primary/50 outline-none" value={editForm.departureStation} onChange={e => setEditForm(p => ({ ...p, departureStation: e.target.value }))} />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-text-secondary mb-1 block">ປາຍທາງ</label>
-                                        <input className="w-full px-3 py-2.5 bg-bg-tertiary border border-border rounded-xl text-sm text-text-primary focus:ring-2 focus:ring-primary/50 outline-none" value={editForm.arrivalStation} onChange={e => setEditForm(p => ({ ...p, arrivalStation: e.target.value }))} />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-text-secondary mb-1 block">ໝາຍເລກທີ່ນັ່ງ</label>
-                                        <input className="w-full px-3 py-2.5 bg-bg-tertiary border border-border rounded-xl text-sm text-text-primary focus:ring-2 focus:ring-primary/50 outline-none" value={editForm.seatNumber} onChange={e => setEditForm(p => ({ ...p, seatNumber: e.target.value }))} />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-text-secondary mb-1 block">ລາຄາ (ກີບ)</label>
-                                        <input type="number" min={0} className="w-full px-3 py-2.5 bg-bg-tertiary border border-border rounded-xl text-sm text-text-primary focus:ring-2 focus:ring-primary/50 outline-none" value={editForm.price} onChange={e => setEditForm(p => ({ ...p, price: Number(e.target.value) }))} />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-text-secondary mb-1 block">ສະຖານະ</label>
-                                        <select className="w-full px-3 py-2.5 bg-bg-tertiary border border-border rounded-xl text-sm text-text-primary focus:ring-2 focus:ring-primary/50 outline-none" value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value as Booking['status'] }))}>
-                                            {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-bold text-text-secondary mb-1 block">ການຊຳລະ</label>
-                                        <select className="w-full px-3 py-2.5 bg-bg-tertiary border border-border rounded-xl text-sm text-text-primary focus:ring-2 focus:ring-primary/50 outline-none" value={editForm.paymentStatus} onChange={e => setEditForm(p => ({ ...p, paymentStatus: e.target.value as Booking['paymentStatus'] }))}>
-                                            <option value="pending">ລໍຖ້າ</option>
-                                            <option value="completed">ຈ່າຍແລ້ວ</option>
-                                            <option value="refunded">ຄືນເງິນ</option>
-                                            <option value="failed">ລົ້ມເຫລວ</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex gap-3 px-6 pb-6">
-                                <button onClick={() => { setShowEditModal(false); setErrorMsg(null); }} className="flex-1 py-2.5 bg-bg-tertiary text-text-primary rounded-xl text-sm font-bold hover:bg-border">ຍົກເລີກ</button>
-                                <button onClick={handleUpdate} disabled={submitting} className="flex-[2] py-2.5 bg-primary text-white rounded-xl text-sm font-bold flex items-center justify-center disabled:opacity-50">
+                    <ModalPortal
+                        title={`ແກ້ໄຂ: #${selectedBooking._id.slice(-6).toUpperCase()}`}
+                        onClose={() => { setShowEditModal(false); setErrorMsg(null); }}
+                        maxWidth="max-w-4xl"
+                        footer={
+                            <div className="flex gap-3">
+                                <button onClick={() => { setShowEditModal(false); setErrorMsg(null); }} className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-bold hover:bg-gray-200 transition-colors">ຍົກເລີກ</button>
+                                <button onClick={handleUpdate} disabled={submitting} className="flex-[2] py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold flex items-center justify-center disabled:opacity-50 hover:bg-blue-700 transition-colors">
                                     {submitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}ບັນທຶກການແກ້ໄຂ
                                 </button>
                             </div>
-                        </div>
-                    </div>
+                        }
+                    >
+                        {errorMsg && <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl flex items-center text-xs font-bold mb-4"><AlertCircle className="w-4 h-4 mr-2" />{errorMsg}</div>}
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">ຕ້ນທາງ</label>
+                                    <input className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none" value={editForm.departureStation} onChange={e => setEditForm(p => ({ ...p, departureStation: e.target.value }))} />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">ປາຍທາງ</label>
+                                    <input className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none" value={editForm.arrivalStation} onChange={e => setEditForm(p => ({ ...p, arrivalStation: e.target.value }))} />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">ຫມາຍເລກທີ່ນັ່ງ</label>
+                                    <input className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none" value={editForm.seatNumber} onChange={e => setEditForm(p => ({ ...p, seatNumber: e.target.value }))} />
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">ລາຄາ (ກີບ)</label>
+                                    <input type="number" min={0} className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none" value={editForm.price} onChange={e => setEditForm(p => ({ ...p, price: Number(e.target.value) }))} />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">ສະຖານະ</label>
+                                    <select className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none" value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value as Booking['status'] }))}>
+                                        {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1 block">ການຊຳລະ</label>
+                                    <select className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/50 outline-none" value={editForm.paymentStatus} onChange={e => setEditForm(p => ({ ...p, paymentStatus: e.target.value as Booking['paymentStatus'] }))}>
+                                        <option value="pending">ລໍຖ້າ</option>
+                                        <option value="completed">ຈ່າຍແລ້ວ</option>
+                                        <option value="refunded">ຄືນເງິນ</option>
+                                        <option value="failed">ລ້ມເຫລວ</option>
+                                     </select>
+                                 </div>
+                             </div>
+                         </div>
+                    </ModalPortal>
                 )}
+
 
                 {/* ── CANCEL/DELETE MODAL ── */}
                 {showDeleteModal && selectedBooking && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                        <div className="bg-bg-secondary border border-border rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center animate-in zoom-in-95 duration-200">
-                            <div className="h-16 w-16 bg-error-light text-error rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-8 h-8" /></div>
-                            <h3 className="text-xl font-black text-text-primary mb-2">ຢືນຢັນການຍົກເລີກ?</h3>
-                            <p className="text-text-tertiary text-sm mb-2">ຍົກເລີກການຈອງ #<span className="font-bold text-text-primary">{selectedBooking._id.slice(-6).toUpperCase()}</span></p>
-                            <p className="text-text-tertiary text-xs mb-6">ຜູ້ໂດຍສານ: {displayName(selectedBooking)}</p>
-                            {errorMsg && <div className="bg-error-light text-error p-3 rounded-xl text-xs font-bold mb-4 flex items-center"><AlertCircle className="w-4 h-4 mr-2" />{errorMsg}</div>}
+                    <ModalPortal
+                        title="ຢືນຢັນການຍົກເລີກ"
+                        onClose={() => { setShowDeleteModal(false); setErrorMsg(null); }}
+                        maxWidth="max-w-md"
+                        footer={
                             <div className="flex gap-3">
-                                <button onClick={() => { setShowDeleteModal(false); setErrorMsg(null); }} className="flex-1 py-3 bg-bg-tertiary rounded-xl text-sm font-bold">ກັບຄືນ</button>
-                                <button onClick={handleCancel} disabled={submitting} className="flex-1 py-3 bg-error text-white rounded-xl text-sm font-bold flex items-center justify-center disabled:opacity-50">
+                                <button onClick={() => { setShowDeleteModal(false); setErrorMsg(null); }} className="flex-1 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-bold">ກັບຄືນ</button>
+                                <button onClick={handleCancel} disabled={submitting} className="flex-1 py-2.5 bg-red-600 text-white rounded-xl text-sm font-bold flex items-center justify-center disabled:opacity-50">
                                     {submitting && <Loader2 className="w-4 h-4 animate-spin mr-2" />}ຍົກເລີກການຈອງ
                                 </button>
                             </div>
+                        }
+                    >
+                        <div className="text-center py-2">
+                            <div className="h-16 w-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-8 h-8" /></div>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">ຍົກເລີກການຈອງ #<span className="font-bold text-gray-900 dark:text-white">{selectedBooking._id.slice(-6).toUpperCase()}</span></p>
+                            <p className="text-gray-400 text-xs mt-1">ຜູ້ໂດຍສານ: {displayName(selectedBooking)}</p>
+                            {errorMsg && <div className="bg-red-50 text-red-700 border border-red-200 p-3 rounded-xl text-xs font-bold mt-4 flex items-center"><AlertCircle className="w-4 h-4 mr-2" />{errorMsg}</div>}
                         </div>
-                    </div>
+                    </ModalPortal>
                 )}
             </div>
-        </MainLayout>
     );
 }

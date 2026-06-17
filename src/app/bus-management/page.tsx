@@ -1,5 +1,10 @@
 import BusManagement from "@/components/BusManagement";
+import MainLayout from "@/components/MainLayout";
 
 export default function BusManagementPage() {
-    return <BusManagement />;
+    return (
+        <MainLayout>
+            <BusManagement />
+        </MainLayout>
+    );
 }
